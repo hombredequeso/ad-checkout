@@ -19,17 +19,17 @@ namespace AdCheckoutTests
         [Fact]
         public void One_Item_No_Rules_Equals_Item_Price()
         {
-            string item = "item1";
-            decimal price = 269.99m;
-            Dictionary<string, decimal> itemPricing = new Dictionary<string, decimal>()
+            const string item = "item1";
+            const decimal price = 269.99m;
+            var itemPricing = new Dictionary<string, decimal>
             {
                 {"item1", price}
             };
             
-            Checkout<string> co = new Checkout<string>(itemPricing);
-            co.Add(item);
+            var checkout = new Checkout<string>(itemPricing);
+            checkout.Add(item);
             
-            decimal total = co.Total();
+            decimal total = checkout.Total();
             total.Should().Be(price);
         }
 
@@ -39,23 +39,23 @@ namespace AdCheckoutTests
         }
 
         [Fact]
-        public void One_Of_Every_Item_Should_Equal_Total_Of_All_Pricings()
+        public void One_Of_Every_Item_Should_Cost_Total_Of_All_Items()
         {
-            var pricingDictionary = 
+            var itemPricing = 
                 new List<decimal>{1.2m, 3.4m, 9.3m}
                 .ToDictionary(_ => RandomProductId(), p => p);
             
-            Checkout<string> co = new Checkout<string>(pricingDictionary);
-            foreach (var pricing in pricingDictionary)
+            var checkout = new Checkout<string>(itemPricing);
+            foreach (var pricing in itemPricing)
             {
-                co.Add(pricing.Key);
+                checkout.Add(pricing.Key);
                 
             }
-            co.Total().Should().Be(pricingDictionary.Values.Sum(p => p));
+            checkout.Total().Should().Be(itemPricing.Values.Sum(p => p));
         }
 
         [Theory]
-        [InlineData(0,0)]    // practically non-sensical, but mathematically theoretically correct.
+        [InlineData(0,0)]    
         [InlineData(1, 1)]
         [InlineData(2, 2)]
         [InlineData(3, 2)]
@@ -63,18 +63,18 @@ namespace AdCheckoutTests
         [InlineData(5, 4)]
         [InlineData(6, 4)]
         [InlineData(7, 5)]
-        public void ThreeForTwo_Discount_Tests(int gotAmount, int payFor)
+        public void ThreeForTwo_Discount_Tests(int checkoutItemCount, int payingForItemCount)
         {
-            int discountAmount = 3;
-            Dictionary<string, decimal> standardPricing = GetPricingDictionary();
+            var discountAmount = 3;
+            var standardPricing = GetPricingDictionary();
             var discountedItem = standardPricing.First();
             var volumeDiscount = new VolumeDiscount<string>(discountedItem.Key, discountAmount, discountAmount-1);
 
-            Checkout<string> co = new Checkout<string>(standardPricing, volumeDiscount);
-            for (int c =0; c < gotAmount; c++)
-                co.Add(discountedItem.Key);
+            var checkout = new Checkout<string>(standardPricing, volumeDiscount);
+            for (var c =0; c < checkoutItemCount; c++)
+                checkout.Add(discountedItem.Key);
 
-            co.Total().Should().Be(standardPricing.First().Value * payFor);
+            checkout.Total().Should().Be(standardPricing.First().Value * payingForItemCount);
         }
         
         [Fact]
@@ -82,30 +82,31 @@ namespace AdCheckoutTests
         {
             var pricingDictionary = GetPricingDictionary();
             
-            Checkout<string> co = new Checkout<string>(pricingDictionary);
+            var checkout = new Checkout<string>(pricingDictionary);
             foreach (var pricing in pricingDictionary)
             {
-                co.Add(pricing.Key);
-                co.Add(pricing.Key);
+                checkout.Add(pricing.Key);
+                checkout.Add(pricing.Key);
             }
-            co.Total().Should().Be(2 *pricingDictionary.Values.Sum(p => p));
+            checkout.Total().Should().Be(2 *pricingDictionary.Values.Sum(p => p));
         }
 
         [Fact]
         public void VolumeDiscount_Is_Not_Applied_To_Items_Not_Volume_Discounted()
         {
-            Dictionary<string, decimal> standardPricing = GetPricingDictionary();
+            var standardPricing = GetPricingDictionary();
 
             var item = standardPricing.First();
-            int discountAmount = 3;
-            int gotAmount = discountAmount - 1;
-            VolumeDiscount<string> volumeDiscount = new VolumeDiscount<string>(item.Key, discountAmount, discountAmount - 1);
+            const int discountAmount = 3;
+            const int gotAmount = discountAmount - 1;
+            var volumeDiscount = 
+                new VolumeDiscount<string>(item.Key, discountAmount, discountAmount - 1);
 
-            Checkout<string> co = new Checkout<string>(standardPricing, volumeDiscount);
+            var checkout = new Checkout<string>(standardPricing, volumeDiscount);
             for (int c =0; c < gotAmount; c++)
-                co.Add(item.Key);
+                checkout.Add(item.Key);
 
-            co.Total().Should().Be(standardPricing.First().Value * gotAmount);
+            checkout.Total().Should().Be(standardPricing.First().Value * gotAmount);
         }
 
         private static Dictionary<string, decimal> GetPricingDictionary()
@@ -126,7 +127,11 @@ namespace AdCheckoutTests
             int forPriceOf)
         {
             if (get == 0)
-                throw new ArgumentException("Cannot get nothing for something :-)");
+                throw new ArgumentException("Cannot get nothing for something :-)", nameof(get));
+            if (forPriceOf < 0)
+                throw new ArgumentException("cannot be less than 0", nameof(forPriceOf));
+            if (item == null)
+                throw new ArgumentException("Cannot have null item", nameof(item));
             Item = item;
             Get = get;
             ForPriceOf = forPriceOf;
@@ -183,8 +188,8 @@ namespace AdCheckoutTests
             List<VolumeDiscount<TItem>> discounts, 
             decimal cost)
         {
-            Items = items;
-            Discounts = discounts;
+            Items = items ?? throw new ArgumentNullException(nameof(items));
+            Discounts = discounts ?? throw new ArgumentNullException(nameof(discounts));
             Cost = cost;
         }
 
@@ -195,13 +200,51 @@ namespace AdCheckoutTests
 
     public static class CostCalculator
     {
-        public static CostingCalculation<TItem> GetCost<TItem>(CostingCalculation<TItem> c)
+        public static CostingCalculation<TItem> GetCost<TItem>(
+            CostingCalculation<TItem> costingCalculation)
         {
-            return c.Discounts.Any()
-                ? GetCost(ApplyNextDiscount(c))
-                : BaseCostAllItems(c);
+            return costingCalculation.Discounts.Any()
+                ? GetCost(ApplyNextDiscount(costingCalculation))
+                : BaseCostAllItems(costingCalculation);
         }
 
+        private static CostingCalculation<TItem> ApplyNextDiscount<TItem>(
+            CostingCalculation<TItem> costingCalculation)
+        {
+            var (discount, remainingDiscounts) = 
+                HeadAndTail(costingCalculation.Discounts);
+
+            if (costingCalculation.Items.ContainsKey(discount.Item))
+            {
+                var (itemCost, itemQuantity) = costingCalculation.Items[discount.Item];
+                var (quotient, remainder) = DivMod(itemQuantity, discount.Get);
+                
+                costingCalculation.Items[discount.Item] = (itemCost, remainder);
+                var cost = quotient * discount.ForPriceOf * itemCost;
+
+                return new CostingCalculation<TItem>(
+                    costingCalculation.Items, 
+                    remainingDiscounts, 
+                    costingCalculation.Cost + cost);
+            }
+            
+            return new CostingCalculation<TItem>(
+                costingCalculation.Items, 
+                remainingDiscounts, 
+                costingCalculation.Cost);
+        }
+
+        private static CostingCalculation<TItem> BaseCostAllItems<TItem>(CostingCalculation<TItem> c)
+        {
+            var allItems = c.Items;
+            var noItems = new Dictionary<TItem, (decimal, int)>();
+
+            return new CostingCalculation<TItem>(
+                noItems,
+                c.Discounts, 
+                c.Cost + allItems.Sum(i => i.Value.Item1 * i.Value.Item2));
+        }
+        
         private static (int, int) DivMod(int dividend, int divisor)
         {
             return (dividend / divisor, dividend % divisor);
@@ -211,35 +254,6 @@ namespace AdCheckoutTests
         {
             return (l.First(), l.Skip(1).ToList());
 
-        }
-
-        private static CostingCalculation<TItem> ApplyNextDiscount<TItem>(CostingCalculation<TItem> c)
-        {
-            var (discount, remainingDiscounts) = HeadAndTail(c.Discounts);
-
-            if (c.Items.ContainsKey(discount.Item))
-            {
-                var (itemCost, itemQuantity) = c.Items[discount.Item];
-                var (quotient, remainder) = DivMod(itemQuantity, discount.Get);
-                
-                c.Items[discount.Item] = (itemCost, remainder);
-                var cost = quotient * discount.ForPriceOf * itemCost;
-
-                return new CostingCalculation<TItem>(
-                    c.Items, 
-                    remainingDiscounts, 
-                    c.Cost + cost);
-            }
-            return new CostingCalculation<TItem>(c.Items, remainingDiscounts.ToList(), c.Cost);
-        }
-
-        private static CostingCalculation<TItem> BaseCostAllItems<TItem>(CostingCalculation<TItem> c)
-        {
-            var baseCostTotal = c.Items.Sum(i => i.Value.Item1 * i.Value.Item2);
-            return new CostingCalculation<TItem>(
-                new Dictionary<TItem, (decimal, int)>(), 
-                c.Discounts, 
-                c.Cost + baseCostTotal);
         }
     }
 }
