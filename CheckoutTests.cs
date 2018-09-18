@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using FluentAssertions;
 using Xunit;
 
@@ -12,9 +11,9 @@ namespace AdCheckoutTests
         [Fact]
         public void No_Items_Totals_Zero()
         {
-            Checkout co = new Checkout(GetPricingDictionary());
-            decimal total = co.Total();
-            total.Should().Be(0);
+            new Checkout<string>(GetPricingDictionary())
+                .Total()
+                .Should().Be(0);
         }
 
         [Fact]
@@ -27,7 +26,7 @@ namespace AdCheckoutTests
                 {"item1", price}
             };
             
-            Checkout co = new Checkout(itemPricing);
+            Checkout<string> co = new Checkout<string>(itemPricing);
             co.Add(item);
             
             decimal total = co.Total();
@@ -46,7 +45,7 @@ namespace AdCheckoutTests
                 new List<decimal>{1.2m, 3.4m, 9.3m}
                 .ToDictionary(_ => RandomProductId(), p => p);
             
-            Checkout co = new Checkout(pricingDictionary);
+            Checkout<string> co = new Checkout<string>(pricingDictionary);
             foreach (var pricing in pricingDictionary)
             {
                 co.Add(pricing.Key);
@@ -71,7 +70,7 @@ namespace AdCheckoutTests
             var discountedItem = standardPricing.First();
             var volumeDiscount = new VolumeDiscount<string>(discountedItem.Key, discountAmount, discountAmount-1);
 
-            Checkout co = new Checkout(standardPricing, volumeDiscount);
+            Checkout<string> co = new Checkout<string>(standardPricing, volumeDiscount);
             for (int c =0; c < gotAmount; c++)
                 co.Add(discountedItem.Key);
 
@@ -83,7 +82,7 @@ namespace AdCheckoutTests
         {
             var pricingDictionary = GetPricingDictionary();
             
-            Checkout co = new Checkout(pricingDictionary);
+            Checkout<string> co = new Checkout<string>(pricingDictionary);
             foreach (var pricing in pricingDictionary)
             {
                 co.Add(pricing.Key);
@@ -102,7 +101,7 @@ namespace AdCheckoutTests
             int gotAmount = discountAmount - 1;
             VolumeDiscount<string> volumeDiscount = new VolumeDiscount<string>(item.Key, discountAmount, discountAmount - 1);
 
-            Checkout co = new Checkout(standardPricing, volumeDiscount);
+            Checkout<string> co = new Checkout<string>(standardPricing, volumeDiscount);
             for (int c =0; c < gotAmount; c++)
                 co.Add(item.Key);
 
@@ -138,17 +137,17 @@ namespace AdCheckoutTests
         public int ForPriceOf { get; }
     }
 
-    public class Checkout
+    public class Checkout<TItem>
     {
-        private readonly List<string> _items;
-        private readonly IDictionary<string, decimal> _stdPricing;
-        private readonly VolumeDiscount<string>[] _pricingRules;
+        private readonly List<TItem> _items;
+        private readonly IDictionary<TItem, decimal> _stdPricing;
+        private readonly VolumeDiscount<TItem>[] _pricingRules;
 
         public Checkout(
-            IDictionary<string, decimal> stdPricing,
-            params VolumeDiscount<string>[] pricingRules)
+            IDictionary<TItem, decimal> stdPricing,
+            params VolumeDiscount<TItem>[] pricingRules)
         {
-            _items = new List<string>();
+            _items = new List<TItem>();
             _stdPricing = stdPricing;
             _pricingRules = pricingRules;
             _pricingRules = pricingRules;
@@ -162,7 +161,7 @@ namespace AdCheckoutTests
                         x => x.Key, 
                         x => (_stdPricing[x.Key], x.Count()));
             
-            var calculation = new CostingCalculation<string>(
+            var calculation = new CostingCalculation<TItem>(
                 costingItems,
                 _pricingRules.ToList(),
                 0);
@@ -170,7 +169,7 @@ namespace AdCheckoutTests
             return CostCalculator.GetCost(calculation).Cost;
         }
         
-        public void Add(string item)
+        public void Add(TItem item)
         {
             _items.Add(item);
         }
@@ -196,7 +195,7 @@ namespace AdCheckoutTests
 
     public static class CostCalculator
     {
-        public static CostingCalculation<string> GetCost(CostingCalculation<string> c)
+        public static CostingCalculation<TItem> GetCost<TItem>(CostingCalculation<TItem> c)
         {
             return c.Discounts.Any()
                 ? GetCost(ApplyNextDiscount(c))
@@ -214,7 +213,7 @@ namespace AdCheckoutTests
 
         }
 
-        private static CostingCalculation<string> ApplyNextDiscount(CostingCalculation<string> c)
+        private static CostingCalculation<TItem> ApplyNextDiscount<TItem>(CostingCalculation<TItem> c)
         {
             var (discount, remainingDiscounts) = HeadAndTail(c.Discounts);
 
@@ -226,19 +225,19 @@ namespace AdCheckoutTests
                 c.Items[discount.Item] = (itemCost, remainder);
                 var cost = quotient * discount.ForPriceOf * itemCost;
 
-                return new CostingCalculation<string>(
+                return new CostingCalculation<TItem>(
                     c.Items, 
                     remainingDiscounts, 
                     c.Cost + cost);
             }
-            return new CostingCalculation<string>(c.Items, remainingDiscounts.ToList(), c.Cost);
+            return new CostingCalculation<TItem>(c.Items, remainingDiscounts.ToList(), c.Cost);
         }
 
-        private static CostingCalculation<string> BaseCostAllItems(CostingCalculation<string> c)
+        private static CostingCalculation<TItem> BaseCostAllItems<TItem>(CostingCalculation<TItem> c)
         {
             var baseCostTotal = c.Items.Sum(i => i.Value.Item1 * i.Value.Item2);
-            return new CostingCalculation<string>(
-                new Dictionary<string, (decimal, int)>(), 
+            return new CostingCalculation<TItem>(
+                new Dictionary<TItem, (decimal, int)>(), 
                 c.Discounts, 
                 c.Cost + baseCostTotal);
         }
