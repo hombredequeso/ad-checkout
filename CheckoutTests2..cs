@@ -220,7 +220,6 @@ namespace AdCheckoutTests2
         }
     }
     
-    
     public class CostingBasket<TItem>
     {
         public CostingBasket(
