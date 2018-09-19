@@ -68,7 +68,7 @@ namespace AdCheckoutTests
             var discountAmount = 3;
             var standardPricing = GetPricingDictionary();
             var discountedItem = standardPricing.First();
-            var volumeDiscount = new VolumeDiscount<string>(discountedItem.Key, discountAmount, discountAmount-1);
+            var volumeDiscount = new NForMDiscount<string>(discountedItem.Key, discountAmount, discountAmount-1);
 
             var checkout = new Checkout<string>(standardPricing, volumeDiscount);
             for (var c =0; c < checkoutItemCount; c++)
@@ -100,7 +100,7 @@ namespace AdCheckoutTests
             const int discountAmount = 3;
             const int gotAmount = discountAmount - 1;
             var volumeDiscount = 
-                new VolumeDiscount<string>(item.Key, discountAmount, discountAmount - 1);
+                new NForMDiscount<string>(item.Key, discountAmount, discountAmount - 1);
 
             var checkout = new Checkout<string>(standardPricing, volumeDiscount);
             for (int c =0; c < gotAmount; c++)
@@ -119,9 +119,14 @@ namespace AdCheckoutTests
         }
     }
 
-    public class VolumeDiscount<TItem>
+    public interface IPricingRule
     {
-        public VolumeDiscount(
+        
+    }
+
+    public class NForMDiscount<TItem>: IPricingRule
+    {
+        public NForMDiscount(
             TItem item, 
             int get, 
             int forPriceOf)
@@ -146,11 +151,11 @@ namespace AdCheckoutTests
     {
         private readonly List<TItem> _items;
         private readonly IDictionary<TItem, decimal> _stdPricing;
-        private readonly VolumeDiscount<TItem>[] _pricingRules;
+        private readonly NForMDiscount<TItem>[] _pricingRules;
 
         public Checkout(
             IDictionary<TItem, decimal> stdPricing,
-            params VolumeDiscount<TItem>[] pricingRules)
+            params NForMDiscount<TItem>[] pricingRules)
         {
             _items = new List<TItem>();
             _stdPricing = stdPricing;
@@ -185,7 +190,7 @@ namespace AdCheckoutTests
     {
         public CostingCalculation(
             Dictionary<TItem, (decimal, int)> items, 
-            List<VolumeDiscount<TItem>> discounts, 
+            List<NForMDiscount<TItem>> discounts, 
             decimal cost)
         {
             Items = items ?? throw new ArgumentNullException(nameof(items));
@@ -194,7 +199,7 @@ namespace AdCheckoutTests
         }
 
         public Dictionary<TItem, (decimal, int)> Items { get; }
-        public List<VolumeDiscount<TItem>> Discounts { get; }
+        public List<NForMDiscount<TItem>> Discounts { get; }
         public decimal Cost { get; }
     }
 
