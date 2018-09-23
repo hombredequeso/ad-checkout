@@ -1,0 +1,47 @@
+﻿{
+	"default" : [
+		{
+		    "pricing": "retail",
+			"productCode" : "classic",
+			"cost" : 269.99
+		},
+		{
+		    "pricing": "retail",
+			"productCode" : "standout",
+			"cost" : 322.99
+		},
+		{
+		    "pricing": "retail",
+			"productCode" : "premium",
+			"cost" : 394.99
+		}
+	],
+	"secondbite" : [
+		{
+			"pricing": "nForM",
+            "productCode": "classic",
+			"get": 3,
+			"for" : 2
+		}
+	],
+	"axilcoffee" : [
+		{
+			"pricing": "discount",
+			"productCode" : "standout",
+			"cost" : 299.99
+		}
+	],
+	"myer": [
+		{
+			"pricing": "nForM",
+			"productCode": "standout",
+			"get": 5,
+			"for" : 4
+		},
+		{
+			"pricing": "discount",
+			"productCode" : "premium",
+			"cost" : 389.99
+		}
+	]
+}

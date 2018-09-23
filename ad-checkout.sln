@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdCheckoutTests", "AdCheckoutTests.csproj", "{3878E677-7F3B-4A15-8F5E-E699A1E5351E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdCheckoutTests", "AdCheckoutTests\AdCheckoutTests.csproj", "{3878E677-7F3B-4A15-8F5E-E699A1E5351E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdCheckout", "AdCheckout\AdCheckout.csproj", "{A048BDE1-8813-4A26-8715-D47C7D307416}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdCheckout", "AdCheckout\AdCheckout.csproj", "{B5936836-EBDD-4297-ADC2-0A4513236159}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +14,9 @@ Global
 		{3878E677-7F3B-4A15-8F5E-E699A1E5351E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3878E677-7F3B-4A15-8F5E-E699A1E5351E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3878E677-7F3B-4A15-8F5E-E699A1E5351E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A048BDE1-8813-4A26-8715-D47C7D307416}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A048BDE1-8813-4A26-8715-D47C7D307416}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A048BDE1-8813-4A26-8715-D47C7D307416}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A048BDE1-8813-4A26-8715-D47C7D307416}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5936836-EBDD-4297-ADC2-0A4513236159}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5936836-EBDD-4297-ADC2-0A4513236159}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5936836-EBDD-4297-ADC2-0A4513236159}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5936836-EBDD-4297-ADC2-0A4513236159}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
