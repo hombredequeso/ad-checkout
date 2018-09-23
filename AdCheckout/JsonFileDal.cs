@@ -6,21 +6,23 @@ using Newtonsoft.Json.Linq;
 
 namespace AdCheckout
 {
-    public class JsonFileDal
+    public static class JsonFileDal
     {
         public static Dictionary<string, List<IPricingRule<string>>> GetPricingRules(JObject db)
         {
-            JArray defaultRetailCosts = (JArray) db[PricingRulesRepository.DefaultCustomerCode];
-            List<PerItemCosting<string>> x = defaultRetailCosts.ToObject<List<PerItemCosting<string>>>();
+            JArray defaultCustomerRules = 
+                (JArray) db[PricingRulesRepository.DefaultCustomerCode];
+            List<PerItemCosting<string>> defaultPerItemCostings = 
+                defaultCustomerRules.ToObject<List<PerItemCosting<string>>>();
             
-            IEnumerable<KeyValuePair<string, List<IPricingRule<string>>>> zz = db
+            IEnumerable<KeyValuePair<string, List<IPricingRule<string>>>> customerPricingRules = db
                 .Properties()
                 .Select(p => new KeyValuePair<string, List<IPricingRule<string>>>(
                     p.Name,
-                    ToPricingRules((JArray) p.Value, x)));
+                    ToPricingRules((JArray) p.Value, defaultPerItemCostings)));
             
             Dictionary<string, List<IPricingRule<string>>> pricingDictionary = 
-                new Dictionary<string, List<IPricingRule<string>>>(zz);
+                new Dictionary<string, List<IPricingRule<string>>>(customerPricingRules);
             
             return pricingDictionary;
         }
@@ -45,7 +47,9 @@ namespace AdCheckout
                 case "retail": return pricing.ToObject<PerItemCosting<string>>();
                 case "nForM" :
                     string productCode = (string) pricing["productCode"];
-                    decimal amount = retailCosts.First(c => c.ProductCode == productCode).Cost;
+                    decimal amount = pricing.ContainsKey("price") 
+                        ? pricing["price"].Value<Decimal>()
+                        : retailCosts.First(c => c.ProductCode == productCode).Cost;
                     int @get = (int) pricing["get"];
                     int @for = (int) pricing["for"];
 
