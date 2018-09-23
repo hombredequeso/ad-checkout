@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Xml.Schema;
 using AdCheckout;
 using AdCheckout.Costing;
 using FluentAssertions;
@@ -70,6 +71,29 @@ namespace AdCheckoutTests
             var total = checkout.Total();
 
             total.Should().Be(1294.96m);
+        }
+
+        [Fact]
+        public void Myer_Customer()
+        {
+            var defaultPricingRules =
+                _pricingRulesRepository.GetPricingRules("myer");
+            Checkout<string> checkout = new Checkout<string>(defaultPricingRules);
+            
+            checkout.Add("standout");
+            checkout.Add("standout");
+            checkout.Add("standout");
+            checkout.Add("standout");
+            checkout.Add("standout");    // pay for 4
+            checkout.Add("standout");    
+            checkout.Add("standout");    // plus 2 (6 total)
+            
+            checkout.Add("premium");
+            
+            checkout.Add("classic");
+
+
+            checkout.Total().Should().Be(2597.92m);
         }
     }
 }

@@ -47,8 +47,8 @@ namespace AdCheckout
                 case "retail": return pricing.ToObject<PerItemCosting<string>>();
                 case "nForM" :
                     string productCode = (string) pricing["productCode"];
-                    decimal amount = pricing.ContainsKey("price") 
-                        ? pricing["price"].Value<Decimal>()
+                    decimal amount = pricing.ContainsKey("cost") 
+                        ? pricing["cost"].Value<Decimal>()
                         : retailCosts.First(c => c.ProductCode == productCode).Cost;
                     int @get = (int) pricing["get"];
                     int @for = (int) pricing["for"];
