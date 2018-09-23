@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using AdCheckout.Costing.Rules;
 
@@ -22,8 +23,8 @@ namespace AdCheckout.Costing
         }
 
         public decimal Total()
-        {
-            var groupedItems = _items.GroupBy(x => x).ToDictionary(i => i.Key, i => i.Count());
+       {
+            var groupedItems = _items.GroupBy(x => x).ToImmutableDictionary(i => i.Key, i => i.Count());
             var costingBasket = new CostingBasket<TItem>(groupedItems, 0);
             var result = CostCalculator.ApplyCostings(costingBasket, _pricingRules);
             

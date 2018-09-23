@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace AdCheckout.Costing.Rules
 {
@@ -36,7 +37,7 @@ namespace AdCheckout.Costing.Rules
                 int itemCount = basket.ItemCounts[Item];
                 var (quotient, remainder) = DivMod(itemCount, Get);
 
-                var itemsOut = new Dictionary<TItem, int>(basket.ItemCounts) {[Item] = remainder};
+                var itemsOut = basket.ItemCounts.SetItem(Item, remainder);
                 var cost = quotient * ForPriceOf * ItemCost;
                 return new CostingBasket<TItem>(itemsOut, basket.Cost + cost);
             }

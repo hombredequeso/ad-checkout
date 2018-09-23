@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace AdCheckout.Costing.Rules
 {
-    public class RetailCost<TItem> : IPricingRule<TItem>, IEquatable<RetailCost<TItem>>
+    public class PerItemCosting<TItem> : IPricingRule<TItem>, IEquatable<PerItemCosting<TItem>>
     {
-        public RetailCost(TItem productCode, decimal cost)
+        public PerItemCosting(TItem productCode, decimal cost)
         {
             ProductCode = productCode;
             Cost = cost;
@@ -20,15 +20,15 @@ namespace AdCheckout.Costing.Rules
             {
                 int items = basket.ItemCounts[ProductCode];
                 var cost = items * Cost;
-                basket.ItemCounts[ProductCode] = 0;
-                return new CostingBasket<TItem>(basket.ItemCounts, basket.Cost + cost);
+                var itemsOut = basket.ItemCounts.SetItem(ProductCode, 0);
+                return new CostingBasket<TItem>(itemsOut, basket.Cost + cost);
             }
 
             return basket;
         }
         
         #region ValueEquality
-        public bool Equals(RetailCost<TItem> other)
+        public bool Equals(PerItemCosting<TItem> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -40,7 +40,7 @@ namespace AdCheckout.Costing.Rules
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((RetailCost<TItem>) obj);
+            return Equals((PerItemCosting<TItem>) obj);
         }
 
         public override int GetHashCode()
@@ -51,12 +51,12 @@ namespace AdCheckout.Costing.Rules
             }
         }
 
-        public static bool operator ==(RetailCost<TItem> left, RetailCost<TItem> right)
+        public static bool operator ==(PerItemCosting<TItem> left, PerItemCosting<TItem> right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(RetailCost<TItem> left, RetailCost<TItem> right)
+        public static bool operator !=(PerItemCosting<TItem> left, PerItemCosting<TItem> right)
         {
             return !Equals(left, right);
         }

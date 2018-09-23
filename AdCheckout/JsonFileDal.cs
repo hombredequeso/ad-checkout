@@ -11,7 +11,7 @@ namespace AdCheckout
         public static Dictionary<string, List<IPricingRule<string>>> GetPricingRules(JObject db)
         {
             JArray defaultRetailCosts = (JArray) db[PricingRulesRepository.DefaultCustomerCode];
-            List<RetailCost<string>> x = defaultRetailCosts.ToObject<List<RetailCost<string>>>();
+            List<PerItemCosting<string>> x = defaultRetailCosts.ToObject<List<PerItemCosting<string>>>();
             
             IEnumerable<KeyValuePair<string, List<IPricingRule<string>>>> zz = db
                 .Properties()
@@ -27,7 +27,7 @@ namespace AdCheckout
 
         private static List<IPricingRule<string>> ToPricingRules(
             JArray pricings, 
-            List<RetailCost<string>> retailCosts)
+            List<PerItemCosting<string>> retailCosts)
         {
             var prs =
                 from e in pricings
@@ -37,12 +37,12 @@ namespace AdCheckout
 
         private static IPricingRule<string> ToPricingRule(
             JObject pricing, 
-            List<RetailCost<string>> retailCosts)
+            List<PerItemCosting<string>> retailCosts)
         {
             switch ((string) pricing["pricing"])
             {
-                case "discount": return pricing.ToObject<RetailCost<string>>();
-                case "retail": return pricing.ToObject<RetailCost<string>>();
+                case "discount": return pricing.ToObject<PerItemCosting<string>>();
+                case "retail": return pricing.ToObject<PerItemCosting<string>>();
                 case "nForM" :
                     string productCode = (string) pricing["productCode"];
                     decimal amount = retailCosts.First(c => c.ProductCode == productCode).Cost;

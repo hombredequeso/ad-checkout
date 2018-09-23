@@ -20,9 +20,9 @@ namespace AdCheckoutTests
             var defaultPricingRules = 
                 new List<IPricingRule<string>>
                 {
-                    new RetailCost<string>("classic", 269.99m),
-                    new RetailCost<string>("standout", 322.99m),
-                    new RetailCost<string>("premium", 394.99m)
+                    new PerItemCosting<string>("classic", 269.99m),
+                    new PerItemCosting<string>("standout", 322.99m),
+                    new PerItemCosting<string>("premium", 394.99m)
                 };
             IDictionary<string, List<IPricingRule<string>>> _customerPricingRules =
                 new Dictionary<string, List<IPricingRule<string>>>()
@@ -46,9 +46,9 @@ namespace AdCheckoutTests
             var defaultPricingRules = 
                 new List<IPricingRule<string>>
                 {
-                    new RetailCost<string>("classic", 269.99m),
-                    new RetailCost<string>("standout", 322.99m),
-                    new RetailCost<string>("premium", 394.99m)
+                    new PerItemCosting<string>("classic", 269.99m),
+                    new PerItemCosting<string>("standout", 322.99m),
+                    new PerItemCosting<string>("premium", 394.99m)
                 };
 
             pricingRulesRepository.GetPricingRules(PricingRulesRepository.DefaultCustomerCode)
@@ -66,10 +66,10 @@ namespace AdCheckoutTests
             var expectedAxilPricingRules = 
                 new List<IPricingRule<string>>
                 {
-                    new RetailCost<string>("standout", 299.99m),
-                    new RetailCost<string>("classic", 269.99m),
-                    new RetailCost<string>("standout", 322.99m),
-                    new RetailCost<string>("premium", 394.99m)
+                    new PerItemCosting<string>("standout", 299.99m),
+                    new PerItemCosting<string>("classic", 269.99m),
+                    new PerItemCosting<string>("standout", 322.99m),
+                    new PerItemCosting<string>("premium", 394.99m)
                 };
 
             var result = pricingRulesRepository.GetPricingRules("axilcoffee");

@@ -13,9 +13,9 @@ namespace AdCheckoutTests
         {
             return new List<IPricingRule<string>>
             {
-                new RetailCost<string>("item1", 1.10m),
-                new RetailCost<string>("item2", 2.30m),
-                new RetailCost<string>("item3", 5.00m)
+                new PerItemCosting<string>("item1", 1.10m),
+                new PerItemCosting<string>("item2", 2.30m),
+                new PerItemCosting<string>("item3", 5.00m)
             };
             
         }
@@ -36,7 +36,7 @@ namespace AdCheckoutTests
             const decimal price = 269.99m;
             var pricingRules =  new List<IPricingRule<string>>
             {
-                new RetailCost<string>(item, price)
+                new PerItemCosting<string>(item, price)
             };
             
             var checkout = new Checkout<string>(pricingRules);
@@ -54,7 +54,7 @@ namespace AdCheckoutTests
         {
             List<(string, decimal)> retailPrices =
                 OnlyRetailPriceRules()
-                    .OfType<RetailCost<string>>()
+                    .OfType<PerItemCosting<string>>()
                     .Select(r => (r.ProductCode, r.Cost))
                     .ToList();
 
@@ -84,7 +84,7 @@ namespace AdCheckoutTests
         public void ThreeForTwo_Discount_Tests(int checkoutItemCount, int payingForItemCount)
         {
             List<IPricingRule<string>> stdRules = OnlyRetailPriceRules();
-            var standardItemPrice = stdRules.OfType<RetailCost<string>>().First();
+            var standardItemPrice = stdRules.OfType<PerItemCosting<string>>().First();
             var discountAmount = 3;
             var discountedItem = standardItemPrice.ProductCode;
             
