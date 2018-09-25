@@ -1,4 +1,13 @@
-## Program
+# Ad Checkout
+
+Console application for calculating price on checkout.
+
+## Prerequisites
+
+[.NET Core SDK] (https://www.microsoft.com/net/download)
+
+## Running Program
+
 To run the program:
 
 ```
@@ -15,18 +24,19 @@ dotnet run -- -c myer -p premium standout standout standout standout standout
 ```
 
 ## Tests
-xunit tests are provided in AdCheckoutTests
+
+XUnit tests are provided in AdCheckoutTests.
 
 ```
 cd AdCheckoutTests
 dotnet test
 ```
 
-## Program Overview
-The type of the item is generic, TItem. For the most part strings are used here.
+## Implementation Overview
 
 1. An instance of Checkout<TItem> is created.
 A list of IPricingRules is passed to it.
+(The type of the item is generic, TItem. For the most part strings are used here).
 2. Items are added to the checkout.
 3. checkout.Total() will give the total price at any time.
 
@@ -48,8 +58,8 @@ To cost a basket the following is done:
 It always adds the default rules onto the end of the rules, for each customer.
 
 ### Construction of Pricing Rules.
-- The high level pricing rules start in pricingDb.json. Here, the default retail prices for each item are specified (as 'default' customer).
+- The high level representation of the pricing rules starts in pricingDb.json. Here, the default retail prices for each item are specified (as 'default' customer).
 Customers with special pricing arrangements then have their special rules.
-- JsonFileDal.GetPricingRules takes pricing rules in JSON format, and turns them into a IPricingRules, suitable to be passed
+- JsonFileDal.GetPricingRules takes pricing rules in JSON format, and turns them into IPricingRules, suitable to be passed
 into the PricingRuleRepository. Here that the pricing format as found in the JSON file gets transformed into pricing rules.
 
