@@ -42,11 +42,18 @@ namespace AdCheckout
                 checkout.Add(item);
             }
 
-            var total = checkout.Total();
-            
-            Console.WriteLine($"Customer: {customer}");
-            Console.WriteLine($"Items: {String.Join(", ", items)}");
-            Console.WriteLine($"Total: {total}");
+            try
+            {
+                var total = checkout.Total();
+
+                Console.WriteLine($"Customer: {customer}");
+                Console.WriteLine($"Items: {String.Join(", ", items)}");
+                Console.WriteLine($"Total: {total}");
+            }
+            catch (CostingException e)
+            {
+                Console.WriteLine($"Error - {e.Message}");
+            }
         }
     }
     

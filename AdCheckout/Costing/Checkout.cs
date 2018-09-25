@@ -32,13 +32,13 @@ namespace AdCheckout.Costing
             if (remainingItems.Any())
             {
                 var itemErrorsMsg = string.Join(Environment.NewLine, remainingItems.Select(ToErrorMsg));
-                throw new CostingException($"Unable to cost the following items/quantities: {itemErrorsMsg}");
+                throw new CostingException($"Unable to cost the following items/quantities: {Environment.NewLine}{itemErrorsMsg}");
             }
 
             return result.Cost;
         }
         
-        private static string ToErrorMsg<TItem>(KeyValuePair<TItem, int> remainingItems)
+        private static string ToErrorMsg<T>(KeyValuePair<T, int> remainingItems)
         {
             return $"{remainingItems.Key} : {remainingItems.Value}";
         }

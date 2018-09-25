@@ -28,7 +28,7 @@ namespace AdCheckout
         
         public List<IPricingRule<string>> GetPricingRules(string customerCode)
         {
-            if (!_customerPricingRules.ContainsKey(DefaultCustomerCode) 
+            if (!_customerPricingRules.ContainsKey(customerCode) 
                 || customerCode == DefaultCustomerCode)
                 return _defaultRules;
             
